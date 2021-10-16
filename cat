@@ -1,0 +1,7 @@
+local args = {...}
+local path = args[1]
+
+local file = fs.open(path, "r")
+content = file.readAll()
+write(content)
+file.close()

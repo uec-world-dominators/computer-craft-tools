@@ -1,0 +1,24 @@
+local args = {...}
+
+if (#args ~= 2) then
+    print("USAGE: dl <url> <path>")
+    return
+end
+
+function get_http(url)
+    local res = http.get(url)
+    local content = res.readAll()
+    res.close()
+    return content
+end
+
+function save(content, path)
+    local file = fs.open(path, "w")
+    file.write(content)
+    file.close()
+end
+
+local url = args[1]
+local path = args[2]
+local content = get_http(url)
+save(content, path)

@@ -1,7 +1,6 @@
 local args = {...}
 
 -- 移動
--- MOVEMENTS = {}
 FORWARD = 0
 BACK = 1
 UP = 2
@@ -37,10 +36,8 @@ REVERSE_MOVEMENT = {
 }
 
 -- 起動時の方角を北とする
--- DIRECTION = NORTH
 
 -- 移動開始時を原点とする相対座標
--- POS = vector.new(0, 0, 0)
 
 Location = {}
 
@@ -53,7 +50,7 @@ function Location.print(self)
     print("pos: (", self.position, ") , facing: ", DIRECTION_STRING[self.direction])
 end
 
--- forcely move
+-- 強制的に移動する
 function Location.move(self, m)
     self:dig(m)
     if self:move_nolog(m) then
@@ -64,12 +61,7 @@ function Location.move(self, m)
     end
 end
 
--- function move_ntimes(m, ntimes)
---     for i = 1, ntimes do
---         move(m)
---     end
--- end
-
+-- 砂の落下も考慮して掘る
 function Location.dig(self, m)
     if m == FORWARD then
         while turtle.detect() do
@@ -130,6 +122,7 @@ function Location.move_reverse_nolog(self, m)
     self:move_nolog(REVERSE_MOVEMENT[m])
 end
 
+-- 巻き戻し
 function Location.rollback(self)
     while 1 do
         rev = table.remove(self.movements, 0)
@@ -142,21 +135,18 @@ function Location.rollback(self)
     end
 end
 
--- function down_to_ground()
---     while 1 do
---         if not(turtle.detect()) then
---             turtle.down()
---         else
---             break
---         end
---     end
--- end
+-- directionの方角を向く
+function Location.face(self, direction)
+    while self.direction ~= direction do
+        self:move(TURN_RIGHT)
+    end
+end
 
 -- 3マス分の高さで直線に掘る
 function line(n, loc)
     loc:move(UP)
     loc:dig(UP)
-    for i = 1, n do 
+    for i = 1, n - 1 do 
         loc:dig(FORWARD)
         loc:move(FORWARD)
         loc:dig(UP)
@@ -165,6 +155,7 @@ function line(n, loc)
     loc:move(DOWN)
 end
 
+-- 高さ3マス x 奥行きm x 幅nで掘りぬく
 function plane(m, n, loc)
     for i = 1, n do
         line(m, loc)
@@ -186,20 +177,56 @@ function plane(m, n, loc)
     end
 end
 
+-- 指定座標に行く（動作は直線的）
+function Location.go(self, vec)
+    -- x
+    if self.position.x > vec.x then
+        self:face(SOUTH)
+    elseif self.position.x < vec.x then
+        self:face(NORTH)
+    end
+    while self.position.x ~= vec.x do
+        self:move(FORWARD)
+    end
+
+    -- y
+    if self.position.y > vec.y then
+        self:face(WEST)
+    elseif self.position.y < vec.y then
+        self:face(EAST)
+    end
+    while self.position.y ~= vec.y do
+        self:move(FORWARD)
+    end
+    
+    -- z
+    if self.position.z > vec.z then
+        while self.position.y ~= vec.y do
+            self:move(DOWN)
+        end
+    elseif self.position.z < vec.z then
+        while self.position.y ~= vec.y do
+            self:move(UP)
+        end
+    end
+end
+
 
 local command = args[1]
 if command == "plane" then
     loc = Location.new(vector.new(0, 0, 0), NORTH)
+    loc:move(FORWARD)
     plane(args[2], args[3], loc)
-    loc:rollback()
+    loc:go(vector.new(0, 0, 0))
+    loc:face(NORTH)
 elseif command == "line" then
     loc = Location.new(vector.new(0, 0, 0), NORTH)
+    loc:move(FORWARD)
     line(args[2], loc)
-    loc:rollback()
+    loc:go(vector.new(0, 0, 0))
+    loc:face(NORTH)
+    -- loc:rollback()
 end
 
 
 -- dl https://mc.shosato.jp/branch.lua branch
-
--- 直方体がすべて空いているものとして帰還するプログラム
--- pos, direction, 関連操作をクラスにまとめる

@@ -19,6 +19,12 @@ function move(m)
     end
 end
 
+function move_ntimes(m, ntimes)
+    for i = 1, ntimes do
+        move(m)
+    end
+end
+
 function dig(m)
     if m == FORWARD then
         while turtle.detect() do
@@ -101,8 +107,29 @@ function line(n)
     move(DOWN)
 end
 
+function plane(m, n)
+    for i = 1, n do
+        line(m)
+        if i ~= n then
+            -- 180度回転
+            if i % 2 == 1 then
+                move(TURN_RIGHT)
+                move(FORWARD)
+                move(TURN_RIGHT)
+            else
+                move(TURN_LEFT)
+                move(FORWARD)
+                move(TURN_LEFT)
+            end
+        else
+            -- 終了
 
-line(args[1])
-return_()
+        end
+    end
+end
+
+-- line(args[1])
+-- return_()
+plane(5, 5)
 
 -- dl https://mc.shosato.jp/branch.lua branch

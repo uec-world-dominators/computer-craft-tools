@@ -8,10 +8,33 @@ DOWN = 3
 TURN_RIGHT = 4
 TURN_LEFT = 5
 
+-- forcely move
 function move(m)
     print("move "..tostring(m))
+    dig(m)
     if move_nolog(m) then
         table.insert(MOVEMENTS, m)
+    else
+        print("failed to move "..tostring(m))
+    end
+end
+
+function dig(m)
+    if m == FORWARD then
+        while turtle.detect() do
+            turtle.dig()
+        end
+    elseif m == BACK then
+        print("cannot dig back")
+        exit()
+    elseif m == UP then
+        while turtle.detectUp() do
+            turtle.digUp()
+        end
+    elseif m == DOWN then
+        while turtle.detectDown() do
+            turtle.digDown()
+        end
     end
 end
 
@@ -71,13 +94,9 @@ end
 function line(n)
     move(UP)
     for i = 1, n do 
-        if turtle.detect() then
-            turtle.dig()
-        end
+        dig(FORWARD)
         move(FORWARD)
-        if turtle.detectDown() then
-            turtle.digDown()
-        end
+        dig(DOWN)
     end
     move(DOWN)
 end

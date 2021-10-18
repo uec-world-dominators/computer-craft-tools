@@ -10,9 +10,11 @@ TURN_LEFT = 5
 
 -- 方角
 NORTH = 0 -- +x
-EAST = 1 -- +y
+EAST = 1 -- +z
 SOUTH = 2 -- -x
-WEST = 3 -- -y
+WEST = 3 -- -z
+
+SLOTS_MAX = 16
 
 DIRECTION_STRING = {
     [NORTH] = "NORTH",
@@ -35,19 +37,78 @@ REVERSE_MOVEMENT = {
     [TURN_LEFT] = TURN_RIGHT,
 }
 
--- 起動時の方角を北とする
+HOOK_LOCK = false
 
+function is_slots_full()
+    local slots_used = 0
+    for i = 1, SLOTS_MAX do
+        local n = turtle.getItemCount(i)
+        if n > 0 then
+            slots_used = slots_used + 1
+        end
+    end
+    return slots_used >= SLOTS_MAX - 1
+end
+
+function drop_all()
+    selected = turtle.getSelectedSlot()
+    for i = 1, SLOTS_MAX do
+        turtle.select(i)
+        turtle.drop()
+    end
+    turtle.select(selected)
+end
+
+function free_slots(original_loc)
+    local full = is_slots_full()
+    print(HOOK_LOCK, full)
+    if full then
+        local loc = original_loc:clone()
+        loc:go(vector.new(0, 0, 0))
+        loc:face(WEST)
+        -- free_slots
+        drop_all()
+
+        loc:go(original_loc.position)
+        loc:face(original_loc.direction)
+    end
+end
+
+-- function refuel_on_low_fuel_level(original_loc)
+--     local level = turtle.getFuelLevel()
+--     if level < 100 then
+--         local loc = original_loc:clone()
+--         loc:go(vector.new(0, 0, 0))
+--         -- refuel
+--         loc:go(original_loc.position)
+--         loc:face(original_loc.direction)
+--     end
+-- end
+
+-- 起動時の方角を北とする
 -- 移動開始時を原点とする相対座標
 
 Location = {}
 
 function Location.new(position, direction)
-    local obj = { position = position, direction = direction, movements = {} }
+    local obj = {
+        position = position,
+        direction = direction,
+        movements = {},
+        hooks = {
+            dig = { free_slots },
+            -- move = {},
+        },
+    }
     return setmetatable(obj, {__index = Location})
 end
 
 function Location.print(self)
     print("pos: (", self.position, ") , facing: ", DIRECTION_STRING[self.direction])
+end
+
+function Location.clone(self)
+    return Location.new(vector.new(self.position.x, self.position.y, self.position.z), self.direction)
 end
 
 -- 強制的に移動する
@@ -63,6 +124,16 @@ end
 
 -- 砂の落下も考慮して掘る
 function Location.dig(self, m)
+
+    -- invoke hooks
+    for i = 1, #self.hooks.dig do
+        if not(HOOK_LOCK) then
+            HOOK_LOCK = true
+            self.hooks.dig[i](self)
+            HOOK_LOCK = false
+        end
+    end
+
     if m == FORWARD then
         while turtle.detect() do
             turtle.dig()
@@ -142,6 +213,40 @@ function Location.face(self, direction)
     end
 end
 
+-- 指定座標に行く（動作は直線的）
+function Location.go(self, vec)
+    -- x
+    if self.position.x > vec.x then
+        self:face(SOUTH)
+    elseif self.position.x < vec.x then
+        self:face(NORTH)
+    end
+    while self.position.x ~= vec.x do
+        self:move(FORWARD)
+    end
+
+    -- z
+    if self.position.z > vec.z then
+        self:face(WEST)
+    elseif self.position.z < vec.z then
+        self:face(EAST)
+    end
+    while self.position.z ~= vec.z do
+        self:move(FORWARD)
+    end
+    
+    -- y
+    if self.position.y > vec.y then
+        while self.position.y ~= vec.y do
+            self:move(DOWN)
+        end
+    elseif self.position.y < vec.y then
+        while self.position.y ~= vec.y do
+            self:move(UP)
+        end
+    end
+end
+
 -- 3マス分の高さで直線に掘る
 function line(n, loc)
     loc:move(UP)
@@ -177,40 +282,6 @@ function plane(m, n, loc)
     end
 end
 
--- 指定座標に行く（動作は直線的）
-function Location.go(self, vec)
-    -- x
-    if self.position.x > vec.x then
-        self:face(SOUTH)
-    elseif self.position.x < vec.x then
-        self:face(NORTH)
-    end
-    while self.position.x ~= vec.x do
-        self:move(FORWARD)
-    end
-
-    -- y
-    if self.position.y > vec.y then
-        self:face(WEST)
-    elseif self.position.y < vec.y then
-        self:face(EAST)
-    end
-    while self.position.y ~= vec.y do
-        self:move(FORWARD)
-    end
-    
-    -- z
-    if self.position.z > vec.z then
-        while self.position.y ~= vec.y do
-            self:move(DOWN)
-        end
-    elseif self.position.z < vec.z then
-        while self.position.y ~= vec.y do
-            self:move(UP)
-        end
-    end
-end
-
 
 local command = args[1]
 if command == "plane" then
@@ -229,4 +300,6 @@ elseif command == "line" then
 end
 
 
+
 -- dl https://mc.shosato.jp/branch.lua branch
+-- 燃料補給、チェスト開放

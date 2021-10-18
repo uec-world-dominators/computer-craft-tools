@@ -162,13 +162,13 @@ function plane(m, n, loc)
         if i ~= n then
             -- 180度回転
             if i % 2 == 1 then
-                loc.move(TURN_RIGHT)
-                loc.move(FORWARD)
-                loc.move(TURN_RIGHT)
+                loc:move(TURN_RIGHT)
+                loc:move(FORWARD)
+                loc:move(TURN_RIGHT)
             else
-                loc.move(TURN_LEFT)
-                loc.move(FORWARD)
-                loc.move(TURN_LEFT)
+                loc:move(TURN_LEFT)
+                loc:move(FORWARD)
+                loc:move(TURN_LEFT)
             end
         else
             -- 終了

@@ -19,7 +19,7 @@ local args = {...}
 
 
 MINECRAFT_LOG_ID = "minecraft:log"
-MINECRAFT_SAPLING_ID = "minecraft:log"
+MINECRAFT_SAPLING_ID = "minecraft:sapling"
 MINECRAFT_LEAVES_ID = "minecraft:leaves"
 
 -- 目の前にある木が成長済みかどうか
@@ -74,31 +74,49 @@ end
 
 -- 目の前の木を伐採する
 local function cut_tree(nav)
-    nav:with(function ()
-        nav:move(FORWARD)
-        while true do
-            local result, info = turtle.inspectUp()
-            if result and (info.name == MINECRAFT_LOG_ID or info.name == MINECRAFT_LEAVES_ID) then
-                -- 木
-                nav:move(UP)
-            else
-                -- 制限ブロックに到達
-                cut_leaf(nav)
-                break
-            end
+    nav:move(FORWARD)
+    while true do
+        local result, info = turtle.inspectUp()
+        if result and (info.name == MINECRAFT_LOG_ID or info.name == MINECRAFT_LEAVES_ID) then
+            -- 木
+            nav:move(UP)
+        else
+            -- 制限ブロックに到達
+            cut_leaf(nav)
+            break
         end
-    end)
+    end
 end
 
+local function place_sapling()
+    Select_first_slot_of(MINECRAFT_SAPLING_ID)
+    if not(turtle.place()) then
+        print("cannot place sapling, skip")
+        return false
+    else
+        return true
+    end
+end
+
+local function maintenance_single_tree(nav)
+    if is_grown() then
+        nav:with(function ()
+            cut_tree(nav)
+        end)
+        place_sapling()
+    else
+        print("not grown yet")
+    end
+end
+
+
+
+-- main
 local nav = Navigation.new()
+-- Free_slots(nav, CHEST_STATION)
 nav:with(function ()
     while not(turtle.inspect()) do
         nav:move(FORWARD)
     end
-
-    if is_grown() then
-        cut_tree(nav)
-    else
-        print("not grown yet")
-    end
+    maintenance_single_tree(nav)
 end)

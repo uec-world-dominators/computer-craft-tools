@@ -85,7 +85,9 @@ function farm_forward()
     end
 end
 
-last_turn_direction = LEFT -- ここをRIGHTにしたら、タートルを右端からスタートさせることも可能
+-- ここをRIGHTにしたら、タートルを右端からスタートさせることも可能
+-- go_homeが動作しないので非推奨
+last_turn_direction = LEFT 
 function decide_turn_direction()
     if last_turn_direction == LEFT then
         last_turn_direction = RIGHT

@@ -100,7 +100,10 @@ function Navigation.move(self, m)
         for i = 1, #self.hooks.move do
             if not(HOOK_LOCK) then
                 HOOK_LOCK = true
-                self.hooks.move[i](self)
+                local nav = self:clone()
+                nav:with(function ()
+                    self.hooks.move[i](nav)
+                end)
                 HOOK_LOCK = false
             end
         end
@@ -143,7 +146,10 @@ function Navigation.dig_force(self, m)
         for i = 1, #self.hooks.dig do
             if not(HOOK_LOCK) then
                 HOOK_LOCK = true
-                self.hooks.dig[i](self)
+                local nav = self:clone()
+                nav:with(function ()
+                    self.hooks.dig[i](nav)
+                end)
                 HOOK_LOCK = false
             end
         end

@@ -6,7 +6,7 @@ shell.run("util.lua")
 
 
 -- 目の前のチェストに持っているものをすべて吐き出す
-local function free_slots(original_nav, chest_station_nav)
+function Free_slots(original_nav, chest_station_nav)
     local nav = original_nav:clone()
     nav:goface(chest_station_nav)
     Drop_all()
@@ -18,7 +18,7 @@ function Create_free_slots_handler(chest_station_nav)
     return function (nav)
         local full = Is_slots_full()
         if full then
-            free_slots(nav, chest_station_nav)
+            Free_slots(nav, chest_station_nav)
         end
     end
 end
@@ -30,7 +30,7 @@ local function refuel(original_nav, chest_station_nav, target_fuel_level)
     local blank_slot = Find_blank_slot()
     print("blank slot "..blank_slot)
     if blank_slot == 0 then
-        free_slots(original_nav, chest_station_nav)
+        Free_slots(original_nav, chest_station_nav)
         blank_slot = Find_blank_slot()
     end
 

@@ -1,0 +1,104 @@
+local turtle = turtle
+local vector = vector
+local shell = shell
+
+shell.run("navigation.lua")
+shell.run("util.lua")
+shell.run("handlers.lua")
+
+local CHEST_STATION = Navigation.new(vector.new(0, 0, 0), WEST)
+local FUEL_STATION = Navigation.new(vector.new(0, 0, 0), SOUTH)
+local TARGET_FUEL_LEVEL = 2000
+
+local hooks = {
+    ["dig"] = {Create_free_slots_handler(CHEST_STATION)},
+    ["move"] = {Create_refuel_handler(FUEL_STATION, CHEST_STATION, TARGET_FUEL_LEVEL)},
+}
+
+local args = {...}
+
+
+MINECRAFT_LOG_ID = "minecraft:log"
+MINECRAFT_SAPLING_ID = "minecraft:log"
+MINECRAFT_LEAVES_ID = "minecraft:leaves"
+
+-- 目の前にある木が成長済みかどうか
+local function is_grown()
+    local result, info = turtle.inspect()
+    return result and info.name == MINECRAFT_LOG_ID
+end
+
+local function there_are_leaves(nav)
+    for i = 1, 4 do
+        nav:move(TURN_RIGHT)
+        if turtle.detect() then
+            return true
+        end
+    end
+    return false
+end
+
+local function move_spiral(nav)
+    local max_range = 2
+    for k = 1, max_range do
+        if not(turtle.detect()) then
+            return
+        end
+        nav:move(FORWARD)
+        nav:move(TURN_RIGHT)
+        for i = 1, 4 do
+            for j = 1, k do
+                nav:move(FORWARD)
+            end
+            nav:move(TURN_RIGHT)
+            for j = 1, k do
+                nav:move(FORWARD)
+            end
+        end
+        if k ~= max_range then
+            nav:move(TURN_LEFT)
+        end
+    end
+end
+
+local function cut_leaf(nav)
+    while not(turtle.detectDown()) do
+        nav:with(function ()
+            if there_are_leaves(nav) then
+                move_spiral(nav)
+            end
+        end)
+        nav:move(DOWN)
+    end
+end
+
+-- 目の前の木を伐採する
+local function cut_tree(nav)
+    nav:with(function ()
+        nav:move(FORWARD)
+        while true do
+            local result, info = turtle.inspectUp()
+            if result and (info.name == MINECRAFT_LOG_ID or info.name == MINECRAFT_LEAVES_ID) then
+                -- 木
+                nav:move(UP)
+            else
+                -- 制限ブロックに到達
+                cut_leaf(nav)
+                break
+            end
+        end
+    end)
+end
+
+local nav = Navigation.new()
+nav:with(function ()
+    while not(turtle.inspect()) do
+        nav:move(FORWARD)
+    end
+
+    if is_grown() then
+        cut_tree(nav)
+    else
+        print("not grown yet")
+    end
+end)

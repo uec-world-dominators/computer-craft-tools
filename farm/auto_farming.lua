@@ -65,11 +65,19 @@ function ready()
     move_forward()
 end
 
+function farm()
+    local _, id = turtle.inspectDown()
+    local is_grown_crop = id["metadata"] == 7
+    if is_grown_crop then
+        turtle.digDown()
+        turtle.placeDown()
+    end
+end
+
 function farm_forward()
     local has_wall_forward = turtle.detect()
     while not has_wall_forward do
-        turtle.digDown()
-        turtle.placeDown()
+        farm()
         has_wall_forward = turtle.detect()
         if not has_wall_forward then
             move_forward()

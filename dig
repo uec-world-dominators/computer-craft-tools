@@ -1,0 +1,155 @@
+local turtle = turtle
+local vector = vector
+local shell = shell
+
+shell.run("navigation.lua")
+shell.run("util.lua")
+
+local args = {...}
+
+
+local CHEST_STATION = Navigation.new(vector.new(0, 0, 0), WEST)
+local FUEL_STATION = Navigation.new(vector.new(0, 0, 0), SOUTH)
+local TARGET_FUEL_LEVEL = 2000
+
+-- ////////////////////////////////////
+-- ////////    handlers ///////////////
+-- ////////////////////////////////////
+
+-- 目の前のチェストに持っているものをすべて吐き出す
+local function free_slots(original_nav)
+    local nav = original_nav:clone()
+    nav:goface(CHEST_STATION)
+    Drop_all()
+    nav:goface(original_nav)
+end
+
+local function free_slots_handler(original_nav)
+    local full = Is_slots_full()
+    if full then
+        free_slots(original_nav)
+    end
+end
+
+-- 目の前のチェストから燃料を補給する
+-- チェストの中身はすべて燃料である必要あり
+local function refuel(original_nav)
+    local blank_slot = Find_blank_slot()
+    print("blank slot "..blank_slot)
+    if blank_slot == 0 then
+        free_slots(original_nav)
+        blank_slot = Find_blank_slot()
+    end
+
+    turtle.select(blank_slot)
+    while turtle.getFuelLevel() < TARGET_FUEL_LEVEL do
+        if turtle.suck(1) then
+            turtle.refuel()
+        else
+            print("failed to suck items, continue")
+            break
+        end
+    end
+end
+
+local function refuel_handler(original_nav)
+    local level = turtle.getFuelLevel()
+    print(level, Manhattan_distance(original_nav.position, FUEL_STATION.position))
+    if level < Manhattan_distance(original_nav.position, FUEL_STATION.position) + 3 then
+        local nav = original_nav:clone()
+        nav:goface(FUEL_STATION)
+        -- refuel
+        refuel(nav)
+        nav:goface(original_nav)
+    end
+end
+
+
+-- 3マス分の高さで直線に掘る
+local function line(n, nav)
+    nav:move(UP)
+    nav:dig(UP)
+    for i = 1, n - 1 do 
+        nav:dig(FORWARD)
+        nav:move(FORWARD)
+        nav:dig(UP)
+        nav:dig(DOWN)
+    end
+    nav:move(DOWN)
+end
+
+-- 高さ;3マス x 奥行きm x 幅nで掘りぬく
+local function plane(m, n, nav)
+    for i = 1, n do
+        line(m, nav)
+        if i < n then
+            -- 180度回転
+            if i % 2 == 1 then
+                nav:move(TURN_RIGHT)
+                nav:move(FORWARD)
+                nav:move(TURN_RIGHT)
+            else
+                nav:move(TURN_LEFT)
+                nav:move(FORWARD)
+                nav:move(TURN_LEFT)
+            end
+        end
+    end
+end
+
+-- 高さ ceil(k/3)*3 マス x 奥行きm x 幅nで掘りぬく
+local function cube(m, n, k, nav)
+    for i = 1, k, 3 do
+        local start_plane = nav:clone()
+        plane(m, n, nav)
+        nav:goface(start_plane)
+
+        if k - i >= 3 then
+            nav:move(UP)
+            nav:move(UP)
+            nav:move(UP)
+        end
+    end
+end
+
+
+local command = args[1]
+if command == "cube" then
+    local m, n, k = tonumber(args[2]), tonumber(args[3]), tonumber(args[4])
+
+    local nav = Navigation.new()
+    nav:set_hooks({["dig"] = {free_slots_handler}, ["move"] = {refuel_handler}})
+    nav:with(function() 
+        nav:move(FORWARD)
+        nav:with(function ()
+            cube(m, n, k, nav)
+        end)
+    end)
+elseif command == "plane" then
+    local m, n = tonumber(args[2]), tonumber(args[3])
+    
+    local nav = Navigation.new()
+    nav:set_hooks({["dig"] = {free_slots_handler}, ["move"] = {refuel_handler}})
+    nav:with(function ()
+        nav:move(FORWARD)
+        nav:with(function ()
+            plane(m, n, nav)
+        end)
+    end)
+elseif command == "line" then
+    local nav = Navigation.new()
+    nav:with(function ()
+        nav:move(FORWARD)
+        line(tonumber(args[2]), nav)
+    end)
+elseif command == "refuel" then
+    local nav = Navigation.new()
+    nav:with(function ()
+        nav:goface(FUEL_STATION)
+        refuel(nav)
+    end)
+end
+
+-- http://www.computercraft.info/wiki/Turtle_(API)
+-- dl https://mc.shosato.jp/branch.lua branch
+-- 燃料補給、チェスト開放

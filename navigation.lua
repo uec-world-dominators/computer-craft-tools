@@ -254,7 +254,7 @@ function Navigation.go(self, vec)
     while self.position.z ~= vec.z do
         self:move(FORWARD)
     end
-    
+
     -- y
     if self.position.y > vec.y then
         while self.position.y ~= vec.y do

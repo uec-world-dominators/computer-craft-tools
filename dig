@@ -54,11 +54,9 @@ end
 
 local function refuel_handler(original_nav)
     local level = turtle.getFuelLevel()
-    print(level, Manhattan_distance(original_nav.position, FUEL_STATION.position))
     if level < Manhattan_distance(original_nav.position, FUEL_STATION.position) + 3 then
         local nav = original_nav:clone()
         nav:goface(FUEL_STATION)
-        -- refuel
         refuel(nav)
         nav:goface(original_nav)
     end
@@ -100,9 +98,9 @@ end
 -- 高さ ceil(k/3)*3 マス x 奥行きm x 幅nで掘りぬく
 local function cube(m, n, k, nav)
     for i = 1, k, 3 do
-        local start_plane = nav:clone()
-        plane(m, n, nav)
-        nav:goface(start_plane)
+        nav:with(function ()
+            plane(m, n, nav)
+        end)
 
         if k - i >= 3 then
             nav:move(UP)

@@ -1,4 +1,4 @@
-local SLOTS_MAX = 16
+SLOTS_MAX = 16
 local turtle = turtle
 local vector = vector
 
@@ -35,4 +35,15 @@ function Drop_all()
         turtle.drop()
     end
     turtle.select(selected)
+end
+
+function Select_first_slot_of(item_id)
+    for i = 1, SLOTS_MAX do
+        turtle.select(i)
+        local info = turtle.getItemDetail()
+        if info and info.name == item_id then
+            return i
+        end
+    end
+    return 0
 end

@@ -1,0 +1,49 @@
+# スクリプトファイルのデプロイ
+
+## 概要
+
+ComputerCraftのスクリプトをGitHubから継続的デプロイしたい
+
+## 動機
+
+- GitHubへの頻繁なpullはやめたい
+- GitHun Webhookでイベントドリブンに
+- Webhookだとサーバがいるが、この程度のツールでエンドポイント用意するのはだるい
+- [Discord bot](https://discord.com/developers/applications)はDiscordのイベントを取得できるがclient型。Discord側とコネクション張ってて、サーバ用意しなくても、ここからイベントを受け取れる
+- Discordを経由すればサーバーレスになる
+
+## アーキテクチャ
+
+```
+GitHub masterへpush
+↓
+GitHub WebhookでDiscordに通知
+↕ (常時コネクション)
+Discord botでメッセージ監視
+GitHubからメッセージが来たら
+git fetch, checkout, rsyncでデプロイ
+```
+
+## 環境
+
+- Kubernetes
+- [Skaffold](https://skaffold.dev/)
+
+## 開発
+
+先にDiscordのトークンを入れたシークレットを作っておく
+
+```sh
+kubectl create secret generic computer-craft-deploy \
+    --from-literal=DISCORD_APP_TOKEN=$DISCORD_APP_TOKEN
+```
+
+```sh
+skaffold dev
+```
+
+## デプロイ
+
+```sh
+skaffold run
+```

@@ -31,12 +31,18 @@ git fetch, checkout, rsyncでデプロイ
 
 ## 開発
 
-先にDiscordのトークンを入れたシークレットを作っておく
+- [Discord Appのポータル](https://discord.com/developers/applications)でアプリケーションを作る
+- DiscordからチャンネルのWebhookURLを取得
+- GitHubのWebhookに、先程のURLの末尾に`/github`を追加したものを作成
+
+- クラスタには先にDiscordのトークンを入れたシークレットを作っておく
 
 ```sh
 kubectl create secret generic computer-craft-deploy \
     --from-literal=DISCORD_APP_TOKEN=$DISCORD_APP_TOKEN
 ```
+
+- ホットリロード
 
 ```sh
 skaffold dev

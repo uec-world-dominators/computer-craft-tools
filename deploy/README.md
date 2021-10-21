@@ -4,6 +4,11 @@
 
 ComputerCraftのスクリプトをGitHubから継続的デプロイしたい
 
+## 機能
+
+GitHubの`master`にpushするとサーバ上で、ディレクトリを持つすべてのComputerのルートディレクトリに[`scripts/`](../scripts/)のファイルをデプロイする。
+Computerを作ったりlabelを付けただけではディレクトリは作られないので、何らかのファイルを少なくとも一つ作成する必要がある。
+
 ## 動機
 
 - GitHubへの頻繁なpullはやめたい

@@ -59,7 +59,7 @@ def deploy_files():
                if os.path.isdir(e)]
 
     for target in targets:
-        subprocess.run(['rsync', os.path.join(SCRIPTS_DIR, ''), target, '-avh'],
+        subprocess.run(['rsync', os.path.join(SCRIPTS_DIR, ''), target, '-ah'],
                        cwd=WORK_DIR).check_returncode()
 
 

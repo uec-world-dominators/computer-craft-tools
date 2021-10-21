@@ -11,8 +11,8 @@ local FUEL_STATION = Navigation.new(vector.new(0, 0, 0), SOUTH)
 local TARGET_FUEL_LEVEL = 2000
 
 local hooks = {
-    ["dig"] = {Create_free_slots_handler(CHEST_STATION)},
-    ["move"] = {Create_refuel_handler(FUEL_STATION, CHEST_STATION, TARGET_FUEL_LEVEL)},
+    dig = {Create_free_slots_handler(CHEST_STATION)},
+    move = {Create_refuel_handler(FUEL_STATION, CHEST_STATION, TARGET_FUEL_LEVEL)},
 }
 
 local args = {...}

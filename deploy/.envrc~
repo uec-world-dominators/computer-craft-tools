@@ -1,0 +1,4 @@
+export DISCORD_APP_TOKEN=""
+export REPOSITORY_PREFIX=""
+export COMPUTER_CRAFT_DIR=""
+export SCRIPTS_DIR=""

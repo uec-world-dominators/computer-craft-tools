@@ -42,7 +42,7 @@ def git_checkout():
     commands = [
         ['git', 'fetch', 'origin', 'master'],
         ['git', 'checkout', 'origin/master'],
-        ['git', 'reset', '--hard origin/master'],
+        ['git', 'reset', '--hard', 'origin/master'],
     ]
 
     init()

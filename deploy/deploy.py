@@ -19,12 +19,20 @@ async def on_ready():
 
 @client.event
 async def on_message(message: discord.Message):
+    if message.content == 'computer-craft-deploy':
+        deploy(message)
+
     if message.author.name == 'GitHub':
         if len(message.embeds) > 0:
             embed: discord.Embed = message.embeds[0]
             if embed.url.startswith(REPOSITORY_PREFIX):
-                git_checkout()
-                deploy_files()
+                deploy(message)
+
+
+def deploy(message: discord.Message):
+    git_checkout()
+    deploy_files()
+    message.reply('Deploy completed!')
 
 
 def init():

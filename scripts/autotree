@@ -94,7 +94,7 @@ end
 
 
 local nav = Navigation.new()
-nav.set_hooks(hooks)
+nav:set_hooks(hooks)
 nav:with(function ()
     local block_turn_right = BlockInfo.new("minecraft:cobblestone", 0)
     local block_turn_left = BlockInfo.new("minecraft:sand", 0)

@@ -18,18 +18,9 @@ local hooks = {
     move = {Create_refuel_handler(FUEL_STATION, CHEST_STATION, TARGET_FUEL_LEVEL)},
 }
 
-local args = {...}
-
-
 local MINECRAFT_LOG_ID = "minecraft:log"
 local MINECRAFT_SAPLING_ID = "minecraft:sapling"
 local MINECRAFT_LEAVES_ID = "minecraft:leaves"
-
--- 目の前にある木が成長済みかどうか
-local function is_grown()
-    local result, info = turtle.inspect()
-    return result and info.name == MINECRAFT_LOG_ID
-end
 
 local function there_are_leaves(nav)
     for i = 1, 4 do
@@ -77,7 +68,7 @@ end
 
 -- 目の前の木を伐採する
 local function cut_tree(nav)
-    nav:move(FORWARD)
+    turtle.digDown()
     while true do
         local result, info = turtle.inspectUp()
         if result and (info.name == MINECRAFT_LOG_ID or info.name == MINECRAFT_LEAVES_ID) then
@@ -93,7 +84,7 @@ end
 
 local function place_sapling()
     Select_first_slot_of(MINECRAFT_SAPLING_ID)
-    if not(turtle.place()) then
+    if not(turtle.placeDown()) then
         print("cannot place sapling, skip")
         return false
     else
@@ -101,51 +92,38 @@ local function place_sapling()
     end
 end
 
-local function maintenance_single_tree(nav)
-    if is_grown() then
-        nav:with(function ()
-            cut_tree(nav)
-        end)
-        place_sapling()
-    else
-        print("not grown yet")
-    end
-end
-
-
-
--- -- main
--- local nav = Navigation.new()
--- -- Free_slots(nav, CHEST_STATION)
--- nav:with(function ()
---     while not(turtle.inspect()) do
---         nav:move(FORWARD)
---     end
---     maintenance_single_tree(nav)
--- end)
-
-
 
 local nav = Navigation.new()
 nav.set_hooks(hooks)
 nav:with(function ()
-    local tracer = Tracer.new(nav, {
-        [FORWARD] = BLOCK_WHITE_WOOL,
-        [TURN_LEFT] = BLOCK_ORANGE_WOOL,
-        [TURN_RIGHT] = BLOCK_MAGENTA_WOOL,
-        stop = BLOCK_BLACK_WOOL,
-    })
+    local block_turn_right = BlockInfo.new("minecraft:cobblestone", 0)
+    local block_turn_left = BlockInfo.new("minecraft:sand", 0)
+    local block_stop = BlockInfo.new("minecraft:redstone_block", 0)
 
     while true do
-        if turtle.detect() then
+        local result, info = turtle.inspect()
+        if result and info.name == MINECRAFT_LOG_ID then
+            nav:move(FORWARD)
             print("cut this tree")
             nav:with(function ()
-                maintenance_single_tree(nav)
+                nav:with(function ()
+                    cut_tree(nav)
+                end)
+                place_sapling()
             end)
-        end
-
-        if tracer:step() == "stop" then
-            break
+        else
+            local result, info = turtle.inspectDown()
+            if result and block_turn_right:equal(info) then
+                nav:move(TURN_RIGHT)
+                nav:move(FORWARD)
+            elseif result and block_turn_left:equal(info) then
+                nav:move(TURN_LEFT)
+                nav:move(FORWARD)
+            elseif result and block_stop:equal(info) then
+                break
+            else
+                nav:move(FORWARD)
+            end
         end
     end
 end)

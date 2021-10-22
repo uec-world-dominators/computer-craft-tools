@@ -59,3 +59,12 @@ function Tracer.trace(self)
 
     end
 end
+
+
+-- Usage
+-- local tracer = Tracer.new(nav, {
+--     [FORWARD] = BLOCK_WHITE_WOOL,
+--     [TURN_LEFT] = BLOCK_ORANGE_WOOL,
+--     [TURN_RIGHT] = BLOCK_MAGENTA_WOOL,
+--     stop = BLOCK_BLACK_WOOL,
+-- })

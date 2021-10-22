@@ -9,7 +9,7 @@ shell.run("blocks.lua")
 shell.run("tracer.lua")
 
 
-local CHEST_STATION = Navigation.new(vector.new(0, 0, 0), WEST)
+local CHEST_STATION = Navigation.new(vector.new(0, 0, 0), EAST)
 local FUEL_STATION = Navigation.new(vector.new(0, 0, 0), SOUTH)
 local TARGET_FUEL_LEVEL = 2000
 
@@ -56,7 +56,7 @@ local function move_spiral(nav)
 end
 
 local function cut_leaf(nav)
-    while not(turtle.detectDown()) do
+    while nav.position.y > 0 do
         nav:with(function ()
             if there_are_leaves(nav) then
                 move_spiral(nav)
@@ -106,12 +106,22 @@ nav:with(function ()
             nav:move(FORWARD)
             print("cut this tree")
             nav:with(function ()
+                cut_tree(nav)
+            end)
+            place_sapling()
+        else
+            local result_down, info_down = turtle.inspectDown()
+            local result_up, info_up = turtle.inspectUp()
+            if (result_down and info_down.name == MINECRAFT_LOG_ID) or
+            (result_up and info_up.name == MINECRAFT_LOG_ID) then
+                print("cut this tree")
                 nav:with(function ()
                     cut_tree(nav)
                 end)
                 place_sapling()
-            end)
-        else
+            end
+
+
             local result, info = turtle.inspectDown()
             if result and block_turn_right:equal(info) then
                 nav:move(TURN_RIGHT)

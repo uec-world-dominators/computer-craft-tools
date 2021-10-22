@@ -70,8 +70,8 @@ function farm()
     local is_grown_crop = id["metadata"] == 7
     if is_grown_crop then
         turtle.digDown()
-        turtle.placeDown()
     end
+    turtle.placeDown()
 end
 
 function farm_forward()
@@ -139,7 +139,6 @@ end
 
 function main()
     ready()
-    farm_forward()
     local was_turning_suceeded = true
     while was_turning_suceeded do
         farm_forward()

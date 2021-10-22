@@ -22,11 +22,10 @@ Computerを作ったりlabelを付けただけではディレクトリは作ら�
 ```
 GitHub masterへpush
 ↓
-GitHub WebhookでDiscordに通知
-↕ (常時コネクション)
+GitHub ActionsでDiscordにPOST
+↕ (WebSocket)
 Discord botでメッセージ監視
-GitHubからメッセージが来たら
-git fetch, checkout, rsyncでデプロイ
+GitHubからメッセージが来たらデプロイ
 ```
 
 ## 環境
@@ -38,9 +37,9 @@ git fetch, checkout, rsyncでデプロイ
 
 - [Discord Appのポータル](https://discord.com/developers/applications)でアプリケーションを作る
 - DiscordからチャンネルのWebhookURLを取得
-- GitHubのWebhookに、先程のURLの末尾に`/github`を追加したものを作成
+- 先程のURLの末尾に`/github`を追加したURLに、POSTする [🔗](../.github/workflows/notification.yml)
 
-- クラスタには先にDiscordのトークンを入れたシークレットを作っておく
+- クラスタには事前にDiscordのトークンを入れたシークレットを作っておく
 
 ```sh
 kubectl create secret generic computer-craft-deploy \

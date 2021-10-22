@@ -139,7 +139,6 @@ end
 
 function main()
     ready()
-    farm_forward()
     local was_turning_suceeded = true
     while was_turning_suceeded do
         farm_forward()

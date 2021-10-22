@@ -5,7 +5,7 @@ import subprocess
 
 client = discord.Client()
 
-DISCORD_BOT_TOKEN = os.environ['DISCORD_APP_TOKEN']
+DISCORD_BOT_TOKEN = os.environ['DISCORD_BOT_TOKEN']
 REPOSITORY_PREFIX = os.environ['REPOSITORY_PREFIX']
 SCRIPTS_DIR = os.environ['SCRIPTS_DIR']
 COMPUTER_CRAFT_DIR = os.path.abspath(os.environ['COMPUTER_CRAFT_DIR'])

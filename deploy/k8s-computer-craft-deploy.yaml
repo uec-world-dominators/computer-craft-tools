@@ -21,12 +21,12 @@ spec:
         name: minecraft
         subPath: server/world/computer
     env:
-      - name: DISCORD_APP_TOKEN
+      - name: DISCORD_BOT_TOKEN
         valueFrom:
           secretKeyRef:
             name: computer-craft-deploy
-            key: DISCORD_APP_TOKEN
-    # kubectl create secret generic computer-craft-deploy --from-literal=DISCORD_APP_TOKEN=$DISCORD_APP_TOKEN
+            key: DISCORD_BOT_TOKEN
+    # kubectl create secret generic computer-craft-deploy --from-literal=DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN
       - name: REPOSITORY_PREFIX
         value: https://github.com/uec-world-dominators/computer-craft-tools/
       - name: COMPUTER_CRAFT_DIR

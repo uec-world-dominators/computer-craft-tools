@@ -44,7 +44,7 @@ git fetch, checkout, rsyncでデプロイ
 
 ```sh
 kubectl create secret generic computer-craft-deploy \
-    --from-literal=DISCORD_APP_TOKEN=$DISCORD_APP_TOKEN
+    --from-literal=DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN
 ```
 
 - ホットリロード

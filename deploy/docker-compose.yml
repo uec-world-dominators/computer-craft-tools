@@ -4,7 +4,7 @@ services:
     build: .
     user: ${UID}:${UID}
     environment:
-      DISCORD_APP_TOKEN: ${DISCORD_APP_TOKEN}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
       REPOSITORY_PREFIX: ${REPOSITORY_PREFIX}
       COMPUTER_CRAFT_DIR: ${COMPUTER_CRAFT_DIR}
       SCRIPTS_DIR: ${SCRIPTS_DIR}

@@ -2,18 +2,19 @@ name: Notification
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Notify
-      run: |
-        curl -X POST \
-          -H 'content-type:application/json' \
-          -d '{"content":"computer-craft-deploy"}' \
-          ${{secrets.DISCORD_WEBHOOK_URL}}
+      - name: Notify
+        run:
+          curl -X POST
+          -H "Content-Type:application/json"
+          -H "X-GitHub-Event:${{github.event_name}}"
+          -d @-
+          ${{secrets.DISCORD_WEBHOOK_URL}} < ${{github.event_path}}
+
+          # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads

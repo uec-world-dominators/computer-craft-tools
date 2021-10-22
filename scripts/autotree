@@ -5,22 +5,25 @@ local shell = shell
 shell.run("navigation.lua")
 shell.run("util.lua")
 shell.run("handlers.lua")
+shell.run("blocks.lua")
+shell.run("tracer.lua")
+
 
 local CHEST_STATION = Navigation.new(vector.new(0, 0, 0), WEST)
 local FUEL_STATION = Navigation.new(vector.new(0, 0, 0), SOUTH)
 local TARGET_FUEL_LEVEL = 2000
 
 local hooks = {
-    ["dig"] = {Create_free_slots_handler(CHEST_STATION)},
-    ["move"] = {Create_refuel_handler(FUEL_STATION, CHEST_STATION, TARGET_FUEL_LEVEL)},
+    dig = {Create_free_slots_handler(CHEST_STATION)},
+    move = {Create_refuel_handler(FUEL_STATION, CHEST_STATION, TARGET_FUEL_LEVEL)},
 }
 
 local args = {...}
 
 
-MINECRAFT_LOG_ID = "minecraft:log"
-MINECRAFT_SAPLING_ID = "minecraft:sapling"
-MINECRAFT_LEAVES_ID = "minecraft:leaves"
+local MINECRAFT_LOG_ID = "minecraft:log"
+local MINECRAFT_SAPLING_ID = "minecraft:sapling"
+local MINECRAFT_LEAVES_ID = "minecraft:leaves"
 
 -- 目の前にある木が成長済みかどうか
 local function is_grown()
@@ -111,12 +114,38 @@ end
 
 
 
--- main
+-- -- main
+-- local nav = Navigation.new()
+-- -- Free_slots(nav, CHEST_STATION)
+-- nav:with(function ()
+--     while not(turtle.inspect()) do
+--         nav:move(FORWARD)
+--     end
+--     maintenance_single_tree(nav)
+-- end)
+
+
+
 local nav = Navigation.new()
--- Free_slots(nav, CHEST_STATION)
+nav.set_hooks(hooks)
 nav:with(function ()
-    while not(turtle.inspect()) do
-        nav:move(FORWARD)
+    local tracer = Tracer.new(nav, {
+        [FORWARD] = BLOCK_WHITE_WOOL,
+        [TURN_LEFT] = BLOCK_ORANGE_WOOL,
+        [TURN_RIGHT] = BLOCK_MAGENTA_WOOL,
+        stop = BLOCK_BLACK_WOOL,
+    })
+
+    while true do
+        if turtle.detect() then
+            print("cut this tree")
+            nav:with(function ()
+                maintenance_single_tree(nav)
+            end)
+        end
+
+        if tracer:step() == "stop" then
+            break
+        end
     end
-    maintenance_single_tree(nav)
 end)

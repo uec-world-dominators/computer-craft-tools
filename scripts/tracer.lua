@@ -16,15 +16,7 @@ function Tracer.new(nav, tracer_config)
 
     local obj = {
         nav = nav,
-        tracer_config = tracer_config or {
-            [FORWARD] = BlockInfo.new(),
-            [BACK] = BlockInfo.new(),
-            [UP] = BlockInfo.new(),
-            [DOWN] = BlockInfo.new(),
-            [TURN_RIGHT] = BlockInfo.new(),
-            [TURN_LEFT] = BlockInfo.new(),
-            stop = BlockInfo.new(),
-        }
+        tracer_config = tracer_config,
     }
     return setmetatable(obj, {__index = Tracer})
 end

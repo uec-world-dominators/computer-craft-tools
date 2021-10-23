@@ -1,0 +1,48 @@
+local turtle = turtle
+local vector = vector
+local shell = shell
+
+shell.run("navigation.lua")
+shell.run("util.lua")
+shell.run("handlers.lua")
+shell.run("blocks.lua")
+shell.run("tracer.lua")
+
+
+local CHEST_STATION = Navigation.new(vector.new(0, 0, 0), EAST)
+local FUEL_STATION = Navigation.new(vector.new(0, 0, 0), SOUTH)
+local TARGET_FUEL_LEVEL = 2000
+
+local hooks = {
+    dig = {Create_free_slots_handler(CHEST_STATION)},
+    move = {Create_refuel_handler(FUEL_STATION, CHEST_STATION, TARGET_FUEL_LEVEL)},
+}
+
+local MINECRAFT_SUGARCANE_ID = "minecraft:reeds"
+
+local nav = Navigation.new()
+nav:set_hooks(hooks)
+nav:with(function ()
+    local block_turn_right = BlockInfo.new("minecraft:cobblestone", 0)
+    local block_turn_left = BlockInfo.new("minecraft:sand", 0)
+    local block_stop = BlockInfo.new("minecraft:redstone_block", 0)
+
+    while true do
+        local result_down, info_down = turtle.inspectDown()
+        if (result_down and info_down.name == MINECRAFT_SUGARCANE_ID) then
+            nav:dig(DOWN)
+        end
+
+        if result_down and block_turn_right:equal(info_down) then
+            nav:move(TURN_RIGHT)
+            nav:move(FORWARD)
+        elseif result_down and block_turn_left:equal(info_down) then
+            nav:move(TURN_LEFT)
+            nav:move(FORWARD)
+        elseif result_down and block_stop:equal(info_down) then
+            break
+        else
+            nav:move(FORWARD)
+        end
+    end
+end)

@@ -84,6 +84,16 @@ function move_up()
     print_coordinate()
 end
 
+function down_until_ground_without_editing_property()
+    while true do
+        local is_on_ground = turtle.detectDown()
+        if is_on_ground then
+            return
+        end
+        turtle.down()
+    end
+end
+
 function down_until_ground()
     while true do
         local is_on_ground = turtle.detectDown()
@@ -129,6 +139,7 @@ function place_up_until_wall_hight()
 end
 
 function main()
+    down_until_ground_without_editing_property()
     place_up_until_wall_hight()
     while true do
         local is_succeeded =  move_forward()

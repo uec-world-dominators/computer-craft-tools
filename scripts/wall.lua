@@ -3,7 +3,7 @@ local vector = vector
 local shell = shell
 
 -- user modifiable
-WALL_HIGHT = 2
+WALL_HIGHT = 4
 LEFT_TURN_BLOCK = "minecraft:planks"
 START_BLOCK = "minecraft:crafting_table"
 --
@@ -22,6 +22,8 @@ LEFT = 124
 STOP = 32
 TURN_LEFT = 33
 NORMAL = 34
+
+MAX_SLOT = 16
 --
 
 -- function has_enough_fuel()
@@ -99,10 +101,21 @@ function down_until_ground()
     end
 end
 
+function place_down_block_with_all_slots()
+    for i = 1, MAX_SLOT, 1 do
+        turtle.select(i)
+        local is_succeeded = turtle.placeDown()
+        if is_succeeded then
+            return
+        end
+    end
+    error("not enough blocks!!")
+end
+
 function place_up_until_wall_hight()
     while z < WALL_HIGHT do
         move_up()
-        turtle.placeDown()
+        place_down_block_with_all_slots()
     end
 end
 
@@ -114,6 +127,7 @@ function main()
         end
         local mode = down_until_ground()
         if mode == STOP then
+            place_up_until_wall_hight()
             break
         elseif mode == TURN_LEFT then
             turn(LEFT)
@@ -122,6 +136,7 @@ function main()
     end
 end
 
+--単体test
 function test_down_until_ground()
     local mode = down_until_ground()
     if mode == STOP then
@@ -131,6 +146,12 @@ function test_down_until_ground()
     end
 end
 
+function test_place_up()
+    place_up_until_wall_hight()
+end
+--
+
+-- 設計
 -- while
 --     前進
 --     ret = 地面に着くまでダウン
@@ -141,6 +162,7 @@ end
 --         turn_left
 --     上に一歩ずつ進みながらブロックを設置する
 
+-- test_down_until_ground()
+test_place_up()
 
-test()
 -- main()

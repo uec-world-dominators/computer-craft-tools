@@ -28,6 +28,10 @@ NORMAL = 34
 --     return turtle.getFuelLevel() > x + y + 1
 -- end
 
+function print_coordinate()
+    print(string.format("x: %d, y: %d, z: %d", x, y, z))
+end
+
 function move_forward()
     -- if not has_enough_fuel() then
     --     emergency_process()
@@ -37,7 +41,7 @@ function move_forward()
         x = x + math.cos(angle)
         y = y + math.sin(angle)
     end
-    print(string.format("x: %d, y: %d", x, y))
+    print_coordinate()
     return succeeded
 end
 
@@ -47,7 +51,7 @@ function move_back()
         x = x - math.cos(angle)
         y = y - math.sin(angle)
     end
-    print(string.format("x: %d, y: %d", x, y))
+    print_coordinate()
     return succeeded
 end
 
@@ -62,19 +66,19 @@ function turn(direction)
 end
 
 function move_down()
-    local succeeded = turtle.up()
+    local succeeded = turtle.down()
     if succeeded then
         z = z - 1
     end
-    print(string.format("x: %d, y: %d", x, y))
+    print_coordinate()
 end
 
 function move_up()
-    local succeeded = turtle.down()
+    local succeeded = turtle.up()
     if succeeded then
         z = z + 1
     end
-    print(string.format("x: %d, y: %d", x, y))
+    print_coordinate()
 end
 
 function down_until_ground()
@@ -95,7 +99,7 @@ function down_until_ground()
     end
 end
 
-function up_until_wall_hight()
+function place_up_until_wall_hight()
     while z < WALL_HIGHT do
         move_up()
         turtle.placeDown()
@@ -114,7 +118,16 @@ function main()
         elseif mode == TURN_LEFT then
             turn(LEFT)
         end
-        up_until_wall_hight()
+        place_up_until_wall_hight()
+    end
+end
+
+function test_down_until_ground()
+    local mode = down_until_ground()
+    if mode == STOP then
+        print("stop mode")
+    elseif mode == TURN_LEFT then
+        turn(LEFT)
     end
 end
 
@@ -129,5 +142,5 @@ end
 --     上に一歩ずつ進みながらブロックを設置する
 
 
-
-main()
+test()
+-- main()

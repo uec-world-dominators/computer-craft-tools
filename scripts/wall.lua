@@ -140,12 +140,7 @@ end
 
 function main()
     down_until_ground_without_editing_property()
-    place_up_until_wall_hight()
     while true do
-        local is_succeeded =  move_forward()
-        if not is_succeeded then
-            error("obstacle error")
-        end
         local mode = down_until_ground()
         if mode == STOP then
             place_up_until_wall_hight()
@@ -154,6 +149,10 @@ function main()
             turn(LEFT)
         end
         place_up_until_wall_hight()
+        local is_succeeded =  move_forward()
+        if not is_succeeded then
+            error("obstacle error")
+        end
     end
 end
 

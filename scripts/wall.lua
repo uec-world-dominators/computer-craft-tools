@@ -3,7 +3,7 @@ local vector = vector
 local shell = shell
 
 -- user modifiable
-WALL_HIGHT = 4
+WALL_HIGHT = 3
 LEFT_TURN_BLOCK = "minecraft:planks"
 START_BLOCK = "minecraft:crafting_table"
 --
@@ -13,6 +13,7 @@ x = 0
 y = 0
 z = 0
 angle = math.pi / 2
+selecting_slot = turtle.getSelectedSlot()
 -- 
 
 -- constant
@@ -101,13 +102,21 @@ function down_until_ground()
     end
 end
 
+function normalize_selecting_slot()
+    if (selecting_slot + 1) % (MAX_SLOT + 1) == 0 then
+        selecting_slot = 1
+    end
+    selecting_slot = selecting_slot + 1
+end
+
 function place_down_block_with_all_slots()
     for i = 1, MAX_SLOT, 1 do
-        turtle.select(i)
+        turtle.select(selecting_slot)
         local is_succeeded = turtle.placeDown()
         if is_succeeded then
             return
         end
+        normalize_selecting_slot()
     end
     error("not enough blocks!!")
 end
@@ -120,6 +129,7 @@ function place_up_until_wall_hight()
 end
 
 function main()
+    place_up_until_wall_hight()
     while true do
         local is_succeeded =  move_forward()
         if not is_succeeded then
@@ -163,6 +173,6 @@ end
 --     上に一歩ずつ進みながらブロックを設置する
 
 -- test_down_until_ground()
-test_place_up()
+-- test_place_up()
 
--- main()
+main()

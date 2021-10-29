@@ -5,7 +5,7 @@ local shell = shell
 -- user modifiable
 WALL_HIGHT = 3
 LEFT_TURN_BLOCK = "minecraft:planks"
-START_BLOCK = "minecraft:crafting_table"
+END_BLOCK = "minecraft:crafting_table"
 --
 
 -- init coordinate property

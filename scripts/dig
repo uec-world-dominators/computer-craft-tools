@@ -13,9 +13,9 @@ local ITEM_TORCH = "minecraft:torch"
 -- 3マス分の高さで直線に掘る
 local function line(n, nav, place_torch_per)
     for i = 1, n - 1 do
-        nav:dig(FORWARD)
         nav:dig(UP)
         nav:dig(DOWN)
+        nav:dig(FORWARD)
         if place_torch_per and (i % place_torch_per) == 1 then
             if Select_first_slot_of(ITEM_TORCH) then
                 if not(Try(turtle.placeDown, 3)) then

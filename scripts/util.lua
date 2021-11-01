@@ -41,6 +41,11 @@ function Drop_all(ignores)
 end
 
 function Select_first_slot_of(item_id)
+    local info = turtle.getItemDetail()
+    if info.name == item_id then
+        return turtle.getSelectedSlot()
+    end
+
     for i = 1, SLOTS_MAX do
         turtle.select(i)
         local info = turtle.getItemDetail()

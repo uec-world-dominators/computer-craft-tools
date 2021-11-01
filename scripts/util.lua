@@ -28,11 +28,14 @@ function Is_slots_full()
     return slots_used >= SLOTS_MAX - 1
 end
 
-function Drop_all()
+function Drop_all(ignores)
     local selected = turtle.getSelectedSlot()
     for i = 1, SLOTS_MAX do
         turtle.select(i)
-        turtle.drop()
+        local item_detail = turtle.getItemDetail()
+        if not(item_detail and ignores and ignores[item_detail.name]) then
+            turtle.drop()
+        end
     end
     turtle.select(selected)
 end
@@ -46,4 +49,16 @@ function Select_first_slot_of(item_id)
         end
     end
     return 0
+end
+
+function Try(fn, ntimes)
+    for i = 1, ntimes do
+        if i > 1 then
+            print("retrying")
+        end
+        if fn() then
+            return true
+        end
+    end
+    return false
 end

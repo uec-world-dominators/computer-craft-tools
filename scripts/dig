@@ -8,25 +8,35 @@ shell.run("handlers.lua")
 
 local args = {...}
 
-
+local ITEM_TORCH = "minecraft:torch"
 
 -- 3マス分の高さで直線に掘る
-local function line(n, nav)
-    nav:move(UP)
-    nav:dig(UP)
-    for i = 1, n - 1 do 
+local function line(n, nav, place_torch_per)
+    for i = 1, n - 1 do
         nav:dig(FORWARD)
-        nav:move(FORWARD)
         nav:dig(UP)
         nav:dig(DOWN)
+        if place_torch_per and (i % place_torch_per) == 1 then
+            if Select_first_slot_of(ITEM_TORCH) then
+                if not(Try(turtle.placeDown, 3)) then
+                    print("cannot place torch")
+                end
+            else
+                print("torch not found")
+            end
+        end
+        nav:move(FORWARD)
     end
-    nav:move(DOWN)
+    nav:dig(UP)
+    nav:dig(DOWN)
 end
 
 -- 高さ;3マス x 奥行きm x 幅nで掘りぬく
-local function plane(m, n, nav)
+local function plane(m, n, nav, place_torch_per)
     for i = 1, n do
-        line(m, nav)
+        -- 1列目に置きたいので `== 1`
+        local do_place_torch = place_torch_per and (i % place_torch_per) == 1
+        line(m, nav, do_place_torch and place_torch_per)
         if i < n then
             -- 180度回転
             if i % 2 == 1 then
@@ -61,9 +71,12 @@ end
 local CHEST_STATION = Navigation.new(vector.new(0, 0, 0), WEST)
 local FUEL_STATION = Navigation.new(vector.new(0, 0, 0), SOUTH)
 local TARGET_FUEL_LEVEL = 2000
+local PLACE_TORCH_PER = 5
 
 local hooks = {
-    ["dig"] = {Create_free_slots_handler(CHEST_STATION)},
+    ["dig"] = {Create_free_slots_handler(CHEST_STATION, {
+        [ITEM_TORCH] = true,
+    })},
     ["move"] = {Create_refuel_handler(FUEL_STATION, CHEST_STATION, TARGET_FUEL_LEVEL)},
 }
 
@@ -81,13 +94,13 @@ if command == "cube" then
     end)
 elseif command == "plane" then
     local m, n = tonumber(args[2]), tonumber(args[3])
-    
+
     local nav = Navigation.new()
     nav:set_hooks(hooks)
     nav:with(function ()
         nav:move(FORWARD)
         nav:with(function ()
-            plane(m, n, nav)
+            plane(m, n, nav, PLACE_TORCH_PER)
         end)
     end)
 elseif command == "line" then
@@ -97,13 +110,6 @@ elseif command == "line" then
         nav:move(FORWARD)
         line(tonumber(args[2]), nav)
     end)
--- elseif command == "refuel" then
---     local nav = Navigation.new()
---     nav:set_hooks(hooks)
---     nav:with(function ()
---         nav:goface(FUEL_STATION)
---         refuel(nav)
---     end)
 end
 
 -- http://www.computercraft.info/wiki/Turtle_(API)

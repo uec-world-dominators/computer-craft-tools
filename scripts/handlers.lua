@@ -6,19 +6,19 @@ shell.run("util.lua")
 
 
 -- 目の前のチェストに持っているものをすべて吐き出す
-function Free_slots(original_nav, chest_station_nav)
+function Free_slots(original_nav, chest_station_nav, ignores)
     local nav = original_nav:clone()
     nav:goface(chest_station_nav)
-    Drop_all()
+    Drop_all(ignores)
     nav:goface(original_nav)
 end
 
 -- スロット開放ハンドラを作成
-function Create_free_slots_handler(chest_station_nav)
+function Create_free_slots_handler(chest_station_nav, ignores)
     return function (nav)
         local full = Is_slots_full()
         if full then
-            Free_slots(nav, chest_station_nav)
+            Free_slots(nav, chest_station_nav, ignores)
         end
     end
 end

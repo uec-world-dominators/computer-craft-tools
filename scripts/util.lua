@@ -13,7 +13,7 @@ function Find_blank_slot()
             return i
         end
     end
-    return 0
+    return nil
 end
 
 function Is_slots_full()

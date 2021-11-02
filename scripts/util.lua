@@ -53,7 +53,7 @@ function Select_first_slot_of(item_id)
             return i
         end
     end
-    return 0
+    return nil
 end
 
 function Try(fn, ntimes)

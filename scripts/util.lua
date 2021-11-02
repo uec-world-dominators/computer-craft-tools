@@ -76,3 +76,29 @@ function Try(fn, ntimes)
     end
     return false
 end
+
+-- できるだけまとめる（ソートはしない）
+function SortSlots()
+    local cache = {}
+    for i = 1, SLOTS_MAX do
+        turtle.select(i)
+        local info = turtle.getItemDetail()
+        if info then
+            if cache[info.name] then
+                while true do
+                    if turtle.getItemCount() == 0 then
+                        break
+                    end
+
+                    local success = turtle.transferTo(cache[info.name])
+                    if not(success) then
+                        cache[info.name] = i
+                        break
+                    end
+                end
+            else
+                cache[info.name] = i
+            end
+        end
+    end
+end

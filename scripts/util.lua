@@ -42,7 +42,7 @@ end
 
 function Select_first_slot_of(item_id)
     local info = turtle.getItemDetail()
-    if info.name == item_id then
+    if info and info.name == item_id then
         return turtle.getSelectedSlot()
     end
 

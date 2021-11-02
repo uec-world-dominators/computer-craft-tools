@@ -17,7 +17,6 @@ local function line(n, nav, place_torch_per)
         nav:dig(DOWN)
         nav:dig(FORWARD)
         if place_torch_per and (i % place_torch_per) == 1 then
-            if Select_first_slot_of(ITEM_TORCH) > 0 then
                 if not(turtle.placeDown()) then
                     print("cannot place torch")
                 end

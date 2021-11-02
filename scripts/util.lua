@@ -76,3 +76,53 @@ function Try(fn, ntimes)
     end
     return false
 end
+
+-- 目の前にあるチェストから燃料補給
+-- マグマバケツ対応版
+function Refuel2(target_fuel_level)
+    local ITEM_LAVA_BUCKET = "minecraft:lava_bucket"
+    local ITEM_BUCKET = "minecraft:bucket"
+
+    local target_fuel_level = target_fuel_level or 1000
+
+    while true do
+        local working_slot = Find_blank_slot()
+
+        if not(working_slot) then
+            print("Insufficient blank slots")
+            return false
+        end
+
+        if turtle.getFuelLevel() >= target_fuel_level then
+            print("Target fuel level is already satisfied")
+            return true
+        end
+
+        if turtle.getFuelLevel() == turtle.getFuelLimit() then
+            print("Fuel limit reached")
+            return true
+        end
+
+        turtle.select(working_slot)
+        if turtle.suck() then
+            local item = turtle.getItemDetail()
+            if item.name == ITEM_LAVA_BUCKET then
+                -- lava
+                local empty_buckets_slot = Find_first_slot_of(ITEM_BUCKET) or Find_blank_slot()
+                if empty_buckets_slot then
+                    turtle.refuel()
+                    turtle.transferTo(empty_buckets_slot)
+                else
+                    print("Insufficient blank slots for lava bucket refuel, skip.")
+                end
+            else
+                -- not lava
+                turtle.refuel()
+            end
+        else
+            print("No more fuel to suck")
+            return true
+        end
+    end
+    return true
+end

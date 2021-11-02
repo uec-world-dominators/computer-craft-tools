@@ -36,15 +36,7 @@ local function refuel(original_nav, chest_station_nav, target_fuel_level)
         error("Insufficient blank slot to refuel")
     end
 
-    turtle.select(blank_slot)
-    while turtle.getFuelLevel() < target_fuel_level do
-        if turtle.suck(1) then
-            turtle.refuel()
-        else
-            print("failed to suck items, continue")
-            break
-        end
-    end
+    Refuel2(target_fuel_level)
 end
 
 -- 燃料補給ハンドラを作成

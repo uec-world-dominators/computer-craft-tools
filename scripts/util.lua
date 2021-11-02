@@ -40,20 +40,29 @@ function Drop_all(ignores)
     turtle.select(selected)
 end
 
-function Select_first_slot_of(item_id)
+function Find_first_slot_of(item_id)
     local info = turtle.getItemDetail()
     if info and info.name == item_id then
         return turtle.getSelectedSlot()
     end
 
     for i = 1, SLOTS_MAX do
-        turtle.select(i)
-        local info = turtle.getItemDetail()
+        local info = turtle.getItemDetail(i)
         if info and info.name == item_id then
             return i
         end
     end
     return nil
+end
+
+function Select_first_slot_of(item_id)
+    local slot = Find_first_slot_of(item_id)
+    if slot then
+        turtle.select(slot)
+        return slot
+    else
+        return nil
+    end
 end
 
 function Try(fn, ntimes)

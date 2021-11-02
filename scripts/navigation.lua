@@ -54,7 +54,7 @@ local DETECT_FUNCTIONS = {
     [DOWN] = turtle.detectDown,
 }
 
-local HOOK_LOCK = false
+local hook_locks = {}
 
 -- 起動時の方角を北とする
 -- 移動開始時を原点とする相対座標
@@ -98,13 +98,13 @@ function Navigation.move(self, m)
     -- invoke hooks
     if self.hooks.move then
         for i = 1, #self.hooks.move do
-            if not(HOOK_LOCK) then
-                HOOK_LOCK = true
+            if not(hook_locks["move"]) then
+                hook_locks["move"] = true
                 local nav = self:clone()
                 nav:with(function ()
                     self.hooks.move[i](nav)
                 end)
-                HOOK_LOCK = false
+                hook_locks["move"] = false
             end
         end
     end
@@ -144,13 +144,13 @@ function Navigation.dig_force(self, m)
     -- invoke hooks
     if self.hooks.dig then
         for i = 1, #self.hooks.dig do
-            if not(HOOK_LOCK) then
-                HOOK_LOCK = true
+            if not(hook_locks["dig"]) then
+                hook_locks["dig"] = true
                 local nav = self:clone()
                 nav:with(function ()
                     self.hooks.dig[i](nav)
                 end)
-                HOOK_LOCK = false
+                hook_locks["dig"] = false
             end
         end
     end
